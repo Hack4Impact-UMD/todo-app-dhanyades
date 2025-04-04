@@ -44,6 +44,20 @@ function App() {
   */
   const addTask = () => {
     // START EDITING
+    if (title) {
+      const newTask = {
+        id: uuidv4(),
+        title: title,
+        description: description,
+        completed: false, 
+        dueDate: dueDate
+      } 
+
+      setTasks(prevTasks => [...prevTasks, newTask]);
+      setTitle("");
+      setDescription("");
+      setDueDate("");
+    }
     // END EDITING
   };
 
@@ -61,6 +75,12 @@ function App() {
   */
   const toggleCompletion = (id) => {
     // START EDITING
+    setTasks(preTask => preTask.map((elt) => {if (elt.id === id) {
+      return {
+        ...elt,
+        completed: !elt.completed
+      };
+    } return elt}))
     // END EDITING
   };
   
@@ -97,6 +117,12 @@ function App() {
   */
   const calculateProgress = () => {
     // START EDITING
+    if(tasks.length === 0) {
+      return 0;
+    } else {
+      const completedTaskCount = tasks.filter((task) => task.completed === true).length
+      return completedTaskCount / tasks.length * 100; 
+    }
     // END EDITING
   };
 
@@ -116,16 +142,22 @@ function App() {
         <TextField
           required
           label="Title"
+          value={title}
+          onChange={(e) => {setTitle(e.target.value);}}
         />
         <TextField
           label="Description"
+          value={description}
+          onChange={(e) => {setDescription(e.target.value);}}
         />
         <TextField
           label="Due Date"
           type="date"
           InputLabelProps={{ shrink: true }}
+          value={dueDate}
+          onChange={(e) => {setDueDate(e.target.value);}}
         />
-        <Button variant="contained">
+        <Button variant="contained" onClick={addTask}>
           Add Task
         </Button>
       </div>
@@ -139,8 +171,10 @@ function App() {
         componentsProps={{ typography: { variant: "p" } }}
       />
       <LinearProgress
+        value={calculateProgress()}
         variant="determinate"
         sx={{ width: "100%", height: 10, borderRadius: 5, marginBottom: 2 }}
+
       />
       <TaskTable 
         tasks={incompleteOnly ? tasks.filter((task) => !task.completed) : tasks } 
